@@ -5,8 +5,8 @@ ARG github_token
 ENV GITHUB_TOKEN=$github_token
 
 COPY config/maven /root/.m2
-CMD ["/bin/sh", "-c", "envsubst < /root/.m2/settings.prod.xml > /root/.m2/settings.xml"]
-CMD ["/bin/sh", "-c", "test -s /root/.m2/settings.local.xml && cp /root/.m2/settings.local.xml /root/.m2/settings.xml"]
+RUN sed "s/SUPERSECRETTOKEN/$github_token/g" /root/.m2/settings.prod.xml > /root/.m2/settings.xml
+RUN cp /root/.m2/settings.local.xml /root/.m2/settings.xml 2>&1; exit 0
 
 COPY ./src /app/pfg-backend/src
 COPY ./pom.xml /app/pfg-backend/pom.xml

@@ -7,7 +7,7 @@
     <server>
       <id>github</id>
       <username>javieroi</username>
-      <password>${GITHUB_TOKEN}</password>
+      <password>SUPERSECRETTOKEN</password>
     </server>
 
   </servers>
