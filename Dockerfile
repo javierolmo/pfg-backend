@@ -1,8 +1,14 @@
 # Package pfg-backend
 FROM maven:3.5-jdk-8-alpine
-COPY maven-settings.xml /root/.m2/settings.xml
+
+ARG github_token
+ENV GITHUB_TOKEN=$github_token
+
+COPY config/maven /root/.m2
+CMD ["/bin/sh", "-c", "test -s /root/.m2/settings.local.xml && cp /root/.m2/settings.local.xml /root/.m2/settings.xml"]
 COPY ./src /app/pfg-backend/src
 COPY ./pom.xml /app/pfg-backend/pom.xml
+CMD ["/bin/sh", "-c", "envsubst < /root/.m2/settings.xml > /root/.m2/settings.xml"]
 RUN cd /app/pfg-backend && mvn package -DskipTests
 
 # Run pfg-backend
