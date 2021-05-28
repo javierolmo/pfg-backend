@@ -33,3 +33,7 @@ build/
 #sheets
 /sheets
 /data
+.mvn/wrapper/maven-wrapper.jar
+.mvn/wrapper/maven-wrapper.properties
+config/maven/settings.local.xml
+config/maven/settings.local.xml
