@@ -32,7 +32,7 @@ jobs:
             docker-compose --file docker-compose.test.yml build
             docker-compose --file docker-compose.test.yml run sut
           else
-            docker build . --file Dockerfile --build-arg github_token=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
+            docker build . --file Dockerfile --build-arg github_token=${{ secrets.GITHUB_TOKEN }}
           fi
 
   # Push image to GitHub Packages.
