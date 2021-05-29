@@ -1,16 +1,14 @@
 package com.javi.uned.pfgweb.rest;
 
+import com.javi.uned.pfgweb.beans.User;
 import com.javi.uned.pfgweb.beans.login.LoginDTO;
 import com.javi.uned.pfgweb.beans.login.LoginResponse;
-import com.javi.uned.pfgweb.beans.User;
 import com.javi.uned.pfgweb.beans.login.LoginResponseData;
 import com.javi.uned.pfgweb.config.WebSecurityConfig;
 import com.javi.uned.pfgweb.services.UserService;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.SwaggerDefinition;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
