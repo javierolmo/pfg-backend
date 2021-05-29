@@ -56,7 +56,7 @@ public class JWTAuthorizationFilter extends OncePerRequestFilter {
             // Check header
             String authenticationHeader = request.getHeader(HEADER);
             if(authenticationHeader == null || !authenticationHeader.startsWith(PREFIX)) {
-                throw new Exception("Error in checkJWTToken(request)");
+                throw new IOException("Error in checkJWTToken(request)");
             }
 
             // Parse token
@@ -84,11 +84,6 @@ public class JWTAuthorizationFilter extends OncePerRequestFilter {
                 authorities.stream().map(SimpleGrantedAuthority::new).collect(Collectors.toList()));
         SecurityContextHolder.getContext().setAuthentication(auth);
 
-    }
-
-    private boolean checkJWTToken(HttpServletRequest request) {
-        String authenticationHeader = request.getHeader(HEADER);
-        return (authenticationHeader != null) && authenticationHeader.startsWith(PREFIX);
     }
 
     public boolean ensureApplicantId(HttpServletRequest request, Integer id) throws AuthException {

@@ -8,7 +8,7 @@ import com.javi.uned.pfgweb.beans.User;
 import com.javi.uned.pfgweb.config.FileSystemConfig;
 import com.javi.uned.pfgweb.config.JWTAuthorizationFilter;
 import com.javi.uned.pfgweb.exceptions.AuthException;
-import com.javi.uned.pfgweb.exceptions.RestException;
+import com.javi.uned.pfgweb.exceptions.RepositoryException;
 import com.javi.uned.pfgweb.repositories.SheetRepository;
 import com.javi.uned.pfgweb.repositories.UserRepository;
 import com.javi.uned.pfgweb.services.CustomUserDetailsService;
@@ -26,13 +26,11 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.io.IOException;
-import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.TimeUnit;
 
 @CrossOrigin
 @RestController
@@ -112,14 +110,19 @@ public class UserREST {
             JWTAuthorizationFilter jwtAuthorizationFilter = new JWTAuthorizationFilter();
             if(!jwtAuthorizationFilter.ensureApplicantId(request, id)) throw new AuthException("You cannot request a token from another user");
 
+            // Check if user exists
+            Optional<User> optionalUser = userRepository.findById(id.longValue());
+            if(!optionalUser.isPresent()) throw new RepositoryException("Required user does not exist (userid: " + id + ")");
+
             // Generate personal token
-            User user = userRepository.findById(id.longValue()).get();
+            User user = optionalUser.get();
             String personalToken = TokenFactory.personalToken(user, duration);
             return ResponseEntity.ok(personalToken);
 
-        } catch (AuthException ae) {
-            logger.error(ae.getMessage());
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ae.getMessage());
+
+        } catch (AuthException | RepositoryException e) {
+            logger.error(e.getMessage());
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
         }
 
     }

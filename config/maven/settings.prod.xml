@@ -12,29 +12,4 @@
 
   </servers>
 
-  <profiles>
-    <profile>
-      <id>github</id>
-      <repositories>
-        <repository>
-          <id>central</id>
-          <url>https://repo1.maven.org/maven2</url>
-          <releases><enabled>true</enabled></releases>
-          <snapshots><enabled>true</enabled></snapshots>
-        </repository>
-        <repository>
-          <id>github</id>
-          <name>GitHub Javi</name>
-          <url>https://maven.pkg.github.com/javierolmo/pfg-core</url>
-          <snapshots><enabled>true</enabled></snapshots>
-          <releases><enabled>true</enabled></releases>
-        </repository>
-      </repositories>
-    </profile>
-  </profiles>
-
-  <activeProfiles>
-    <activeProfile>github</activeProfile>
-  </activeProfiles>
-
 </settings>

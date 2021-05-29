@@ -6,6 +6,7 @@ import com.javi.uned.pfgweb.beans.Sheet;
 import com.javi.uned.pfgweb.beans.SheetDTO;
 import com.javi.uned.pfgweb.config.FileSystemConfig;
 import com.javi.uned.pfgweb.repositories.SheetRepository;
+import com.javi.uned.pfgweb.util.Formats;
 import io.swagger.annotations.Api;
 import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -89,8 +90,8 @@ public class SheetREST {
             sheetDTO.setStyle(sheet1.getStyle());
             sheetDTO.setDate(sheet1.getDate());
             sheetDTO.setSpecs(new File(fileSystemConfig.getSheetFolder(sheet1.getId()), "specs.json").exists());
-            sheetDTO.setXml(new File(fileSystemConfig.getSheetFolder(sheet1.getId()), sheet1.getId()+".musicxml").exists());
-            sheetDTO.setPdf(new File(fileSystemConfig.getSheetFolder(sheet1.getId()), sheet1.getId()+".pdf").exists());
+            sheetDTO.setXml(new File(fileSystemConfig.getSheetFolder(sheet1.getId()), sheet1.getId() + Formats.MUSICXML).exists());
+            sheetDTO.setPdf(new File(fileSystemConfig.getSheetFolder(sheet1.getId()), sheet1.getId() + Formats.PDF).exists());
             result.add(sheetDTO);
         });
         return result;
@@ -121,8 +122,8 @@ public class SheetREST {
             sheetDTO.setStyle(sheet.getStyle());
             sheetDTO.setDate(sheet.getDate());
             sheetDTO.setSpecs(new File(fileSystemConfig.getSheetFolder(sheet.getId()), "specs.json").exists());
-            sheetDTO.setXml(new File(fileSystemConfig.getSheetFolder(sheet.getId()), id + ".musicxml").exists());
-            sheetDTO.setPdf(new File(fileSystemConfig.getSheetFolder(sheet.getId()), id + ".pdf").exists());
+            sheetDTO.setXml(new File(fileSystemConfig.getSheetFolder(sheet.getId()), id + Formats.MUSICXML).exists());
+            sheetDTO.setPdf(new File(fileSystemConfig.getSheetFolder(sheet.getId()), id + Formats.PDF).exists());
             return sheetDTO;
         } else {
             return null;
@@ -168,13 +169,13 @@ public class SheetREST {
     public ResponseEntity<byte[]> visualizePDF(@PathVariable int id) throws IOException {
 
         // File
-        File file = new File(fileSystemConfig.getSheetFolder(id), id + ".pdf");
+        File file = new File(fileSystemConfig.getSheetFolder(id), id + Formats.PDF);
         byte[] bytes = FileUtils.readFileToByteArray(file);
 
         // Headers
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_PDF);
-        headers.add("content-disposition", "inline;filename=" + file.getName());
+        headers.add(HttpHeaders.CONTENT_DISPOSITION, "inline;filename=" + file.getName());
         headers.setCacheControl("must-revalidate, post-check=0, pre-check=0");
 
         return new ResponseEntity<>(bytes, headers, HttpStatus.OK);
@@ -191,13 +192,13 @@ public class SheetREST {
     public ResponseEntity<byte[]> visualizeXML(@PathVariable int id) throws IOException {
 
         // File
-        File file = new File(fileSystemConfig.getSheetFolder(id), id + ".musicxml");
+        File file = new File(fileSystemConfig.getSheetFolder(id), id + Formats.MUSICXML);
         byte[] bytes = FileUtils.readFileToByteArray(file);
 
         // Headers
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_XML);
-        headers.add("content-disposition", "inline;filename=" + file.getName());
+        headers.add(HttpHeaders.CONTENT_DISPOSITION, "inline;filename=" + file.getName());
         headers.setCacheControl("must-revalidate, post-check=0, pre-check=0");
 
         return new ResponseEntity<>(bytes, headers, HttpStatus.OK);
@@ -220,7 +221,7 @@ public class SheetREST {
         // Headers
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.add("content-disposition", "inline;filename=" + file.getName());
+        headers.add(HttpHeaders.CONTENT_DISPOSITION, "inline;filename=" + file.getName());
         headers.setCacheControl("must-revalidate, post-check=0, pre-check=0");
 
         return new ResponseEntity<>(bytes, headers, HttpStatus.OK);
@@ -233,8 +234,8 @@ public class SheetREST {
         Optional<Sheet> optionalSheet = sheetRepository.findById(id);
 
         if (specsFile.exists() && optionalSheet.isPresent()) {
-            File xml = new File(fileSystemConfig.getSheetFolder(id), id + ".musicxml");
-            File pdf = new File(fileSystemConfig.getSheetFolder(id), id + ".pdf");
+            File xml = new File(fileSystemConfig.getSheetFolder(id), id + Formats.MUSICXML);
+            File pdf = new File(fileSystemConfig.getSheetFolder(id), id + Formats.PDF);
             Sheet sheet = optionalSheet.get();
             if (!xml.exists()) {
                 ObjectMapper objectMapper = new ObjectMapper();
@@ -271,7 +272,7 @@ public class SheetREST {
     @PostMapping("/{id}/file/musicxml")
     public Sheet uploadFileXML(@RequestBody MultipartFile file, @PathVariable Integer id) throws IOException {
         File dir = fileSystemConfig.getSheetFolder(id);
-        File musicxmlFile = new File(String.format("%s/%d.musicxml", dir.getAbsolutePath(), id));
+        File musicxmlFile = new File(String.format("%s/%d%s", dir.getAbsolutePath(), id, Formats.MUSICXML));
         Files.copy(file.getInputStream(), musicxmlFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
         Optional<Sheet> optionalSheet = sheetRepository.findById(id);
         return optionalSheet.isPresent()? optionalSheet.get() : null;
@@ -290,7 +291,7 @@ public class SheetREST {
         Optional<Sheet> optionalSheet = sheetRepository.findById(id);
         if (optionalSheet.isPresent()) {
             File dir = fileSystemConfig.getSheetFolder(id);
-            File localFile = new File(String.format("%s/%d.pdf", dir.getAbsolutePath(), id));
+            File localFile = new File(String.format("%s/%d%s", dir.getAbsolutePath(), id, Formats.PDF));
             Files.copy(file.getInputStream(), localFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
             Sheet sheet = optionalSheet.get();
             sheet.setFinished(true);
@@ -306,10 +307,10 @@ public class SheetREST {
         Optional<Sheet> optionalSheet = sheetRepository.findById(id);
         if(optionalSheet.isPresent()){
             Sheet sheet = optionalSheet.get();
-            File file = new File(fileSystemConfig.getSheetFolder(id), id + ".musicxml");
+            File file = new File(fileSystemConfig.getSheetFolder(id), id + Formats.MUSICXML);
             InputStreamResource resource = new InputStreamResource(new FileInputStream(file));
             return ResponseEntity.ok()
-                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + sheet.getName() + ".musicxml\"")
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + sheet.getName() + Formats.MUSICXML + "\"")
                     .contentLength(file.length())
                     .contentType(MediaType.APPLICATION_OCTET_STREAM)
                     .body(resource);
@@ -323,10 +324,10 @@ public class SheetREST {
         Optional<Sheet> optionalSheet = sheetRepository.findById(id);
         if (optionalSheet.isPresent()) {
             Sheet sheet = optionalSheet.get();
-            File file = new File(fileSystemConfig.getSheetFolder(id), id + ".pdf");
+            File file = new File(fileSystemConfig.getSheetFolder(id), id + Formats.PDF);
             InputStreamResource resource = new InputStreamResource(new FileInputStream(file));
             return ResponseEntity.ok()
-                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + sheet.getName() + ".pdf\"")
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + sheet.getName() + Formats.PDF + "\"")
                     .contentLength(file.length())
                     .contentType(MediaType.APPLICATION_OCTET_STREAM)
                     .body(resource);
