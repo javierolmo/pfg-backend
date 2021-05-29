@@ -1,5 +1,6 @@
 package com.javi.uned.pfgweb.config;
 
+import com.javi.uned.pfgweb.exceptions.AuthException;
 import io.jsonwebtoken.*;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -15,33 +16,59 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class JWTAuthorizationFilter extends OncePerRequestFilter {
-    private static final String HEADER = "Authorization";
-    private static final String PREFIX = "Bearer ";
-    private static final String SECRET = "1234";
+
+    public static final String HEADER = "Authorization";
+    public static final String PREFIX = "jUgnlLgD";
+    public static final String SECRET = "gjN12sSF";
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws ServletException, IOException {
         try {
-            if (checkJWTToken(request, response)) {
-                Claims claims = validateToken(request);
-                if (claims.get("authorities") != null) {
-                    setUpSpringAuthentication(claims);
-                } else {
-                    SecurityContextHolder.clearContext();
-                }
-            }else {
+
+            Claims claims = validateToken(request);
+
+            if (claims.get("authorities") != null) {
+                setUpSpringAuthentication(claims);
+            } else {
                 SecurityContextHolder.clearContext();
             }
+
             chain.doFilter(request, response);
+
         } catch (ExpiredJwtException | UnsupportedJwtException | MalformedJwtException e) {
             response.setStatus(HttpServletResponse.SC_FORBIDDEN);
             response.sendError(HttpServletResponse.SC_FORBIDDEN, e.getMessage());
+        } catch (AuthException authException) {
+            SecurityContextHolder.clearContext();
+            chain.doFilter(request, response);
         }
     }
 
-    private Claims validateToken(HttpServletRequest request) {
-        String jwtToken = request.getHeader(HEADER).replace(PREFIX, "");
-        return Jwts.parser().setSigningKey(SECRET.getBytes()).parseClaimsJws(jwtToken).getBody();
+    /**
+     * Validates JWT token obtaining it's claims
+     * @param request http request with token in header
+     * @return claims
+     * @throws AuthException
+     */
+    private Claims validateToken(HttpServletRequest request) throws AuthException {
+        try {
+
+            // Check header
+            String authenticationHeader = request.getHeader(HEADER);
+            if(authenticationHeader == null || !authenticationHeader.startsWith(PREFIX)) {
+                throw new Exception("Error in checkJWTToken(request)");
+            }
+
+            // Parse token
+            String jwtToken = request.getHeader(HEADER).replace(PREFIX, "");
+            Claims claims = Jwts.parser().setSigningKey(SECRET.getBytes()).parseClaimsJws(jwtToken).getBody();
+
+            return claims;
+
+        } catch (Exception e) {
+            throw new AuthException("Cannot parse JWT Token", e);
+        }
+
     }
 
     /**
@@ -59,8 +86,13 @@ public class JWTAuthorizationFilter extends OncePerRequestFilter {
 
     }
 
-    private boolean checkJWTToken(HttpServletRequest request, HttpServletResponse res) {
+    private boolean checkJWTToken(HttpServletRequest request) {
         String authenticationHeader = request.getHeader(HEADER);
         return (authenticationHeader != null) && authenticationHeader.startsWith(PREFIX);
+    }
+
+    public boolean ensureApplicantId(HttpServletRequest request, Integer id) throws AuthException {
+        Claims claims = validateToken(request);
+        return claims.get("id").equals(id);
     }
 }
