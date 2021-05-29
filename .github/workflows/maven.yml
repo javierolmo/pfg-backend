@@ -28,5 +28,8 @@ jobs:
       with:
         servers: '[{"id": "github", "username": "javierolmo", "password": "${{ secrets.PFG_CORE_TOKEN }}"}]'
 
-    - name: Build with Maven
-      run: mvn -B package -P github --file pom.xml -DskipTests
+    - name: Build and analyze
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      run: mvn -B verify -P github --file pom.xml -DskipTests org.sonarsource.scanner.maven:sonar-maven-plugin:sonar
