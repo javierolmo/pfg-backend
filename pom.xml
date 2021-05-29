@@ -15,7 +15,7 @@
 	<description>PFG Backend</description>
 
 	<properties>
-		<java.version>1.8</java.version>
+		<java.version>1.11</java.version>
 		<sonar.projectKey>javierolmo_pfg-backend</sonar.projectKey>
 		<sonar.organization>javierolmo</sonar.organization>
 		<sonar.host.url>https://sonarcloud.io</sonar.host.url>
@@ -147,6 +147,13 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
+			</plugin>
+
+			<!-- Verify with Sonar Cloud -->
+			<plugin>
+				<groupId>org.sonarsource.scanner.maven</groupId>
+				<artifactId>sonar-maven-plugin</artifactId>
+				<version>3.9.0.2155</version>
 			</plugin>
 
 			<!-- EMPAQUETAR EN UN JAR -->
