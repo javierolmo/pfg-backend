@@ -29,4 +29,4 @@ jobs:
         servers: '[{"id": "github", "username": "javierolmo", "password": "${{ secrets.PFG_CORE_TOKEN }}"}]'
 
     - name: Build with Maven
-      run: mvn -B package -P github --file pom.xml
+      run: mvn -B package -P github --file pom.xml -DskipTests
