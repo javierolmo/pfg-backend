@@ -9,7 +9,7 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.javi.uned</groupId>
-	<artifactId>pfg-web</artifactId>
+	<artifactId>pfg-backend</artifactId>
 	<version>0.0.1</version>
 	<name>pfg-web</name>
 	<description>PFG Backend</description>
@@ -149,13 +149,6 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
-			</plugin>
-
-			<!-- Verify with Sonar Cloud -->
-			<plugin>
-				<groupId>org.sonarsource.scanner.maven</groupId>
-				<artifactId>sonar-maven-plugin</artifactId>
-				<version>3.9.0.2155</version>
 			</plugin>
 
 			<!-- EMPAQUETAR EN UN JAR -->
