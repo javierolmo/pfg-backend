@@ -10,9 +10,7 @@
 	</parent>
 	<groupId>com.javi.uned</groupId>
 	<artifactId>pfg-backend</artifactId>
-	<version>0.0.1</version>
-	<name>pfg-web</name>
-	<description>PFG Backend</description>
+	<version>0.0.2</version>
 
 	<properties>
 		<java.version>11</java.version>
@@ -139,6 +137,19 @@
 			<artifactId>springfox-boot-starter</artifactId>
 			<version>3.0.0</version>
 		</dependency>
+
+		<!-- Logback classic -->
+		<dependency>
+			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-core</artifactId>
+			<version>1.2.3</version>
+		</dependency>
+		<dependency>
+			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-classic</artifactId>
+			<version>1.2.3</version>
+		</dependency>
+
 
 
 	</dependencies>
