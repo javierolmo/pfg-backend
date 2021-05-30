@@ -110,6 +110,11 @@ public class UserREST {
 
         try {
 
+            // Check if token owner exists
+            Optional<User> optionalUser = userRepository.findById(id);
+            if(!optionalUser.isPresent()) throw new RepositoryException("Token owner does not exist (userid: " + id + ")");
+            tokenOwner = optionalUser.get();
+
             // Check if requestor exists
             JWTAuthorizationFilter jwtAuthorizationFilter = new JWTAuthorizationFilter();
             Claims claims = jwtAuthorizationFilter.validateToken(request);
@@ -117,12 +122,7 @@ public class UserREST {
             if(!optionalRequestorUser.isPresent()) throw new RepositoryException("Requestor user does not exist (userid: " + id + ")");
             requestor = optionalRequestorUser.get();
 
-            // Check if token owner exists
-            Optional<User> optionalUser = userRepository.findById(id.longValue());
-            if(!optionalUser.isPresent()) throw new RepositoryException("Token owner does not exist (userid: " + id + ")");
-            tokenOwner = optionalUser.get();
-
-            // Check that the user is requesting his own token
+            // Check if user is requesting his own token
             if(!requestor.getId().equals(id)) throw new AuthException("You cannot request a token from another user");
 
             // Generate personal token
@@ -132,7 +132,8 @@ public class UserREST {
             return ResponseEntity.ok(personalToken);
 
         } catch (AuthException ae) {
-            logger.error("Token can only be requested by owner. Requestor: {}, Token owner: {}", requestor.getEmail(), tokenOwner.getEmail());
+            String requestorEmail = requestor == null? "unknown" : requestor.getEmail();
+            logger.error("Token can only be requested by owner. Requestor: {}, Token owner: {}", requestorEmail, tokenOwner.getEmail());
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ae.getMessage());
         } catch (RepositoryException re) {
             logger.error(re.getMessage());

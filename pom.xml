@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>com.javi.uned</groupId>
 	<artifactId>pfg-backend</artifactId>
-	<version>0.0.2</version>
+	<version>0.0.3</version>
 
 	<properties>
 		<java.version>11</java.version>

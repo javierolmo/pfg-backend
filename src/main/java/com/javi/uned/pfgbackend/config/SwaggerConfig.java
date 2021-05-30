@@ -17,7 +17,7 @@ public class SwaggerConfig {
     public Docket apiDocket() {
         return new Docket(DocumentationType.SWAGGER_2)
                 .select()
-                .apis(RequestHandlerSelectors.basePackage("com.javi.uned.pfgweb.rest"))
+                .apis(RequestHandlerSelectors.basePackage("com.javi.uned.pfgbackend.rest"))
                 .paths(PathSelectors.any())
                 .build()
                 .apiInfo(getApiInfo());

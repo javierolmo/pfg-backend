@@ -19,7 +19,7 @@ class AuthenticationRESTTest {
         LoginDTO loginDTO = new LoginDTO();
         loginDTO.setEmail("tester@gmail.com");
         loginDTO.setPassword("5885");
-        LoginResponse response = authenticationREST.login(loginDTO);
+        LoginResponse response = authenticationREST.login(loginDTO).getBody();
         assert response.getData().getToken().length() > 0;
     }
 
@@ -29,7 +29,7 @@ class AuthenticationRESTTest {
         loginDTO.setEmail("tester@gmail.com");
         loginDTO.setPassword("wrong-password");
         try {
-            LoginResponse loginResponse = authenticationREST.login(loginDTO);
+            LoginResponse loginResponse = authenticationREST.login(loginDTO).getBody();
             assert false;
         } catch (Exception e) {
             assert true;
