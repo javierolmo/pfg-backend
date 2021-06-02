@@ -1,4 +1,4 @@
-package com.javi.uned.pfgbackend.config;
+package com.javi.uned.pfgbackend.config.kafka;
 
 import com.javi.uned.pfg.model.Specs;
 import org.apache.kafka.clients.producer.ProducerConfig;
