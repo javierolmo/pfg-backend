@@ -1,6 +1,7 @@
 package com.javi.uned.pfgbackend.config;
 
 import com.javi.uned.pfgbackend.repositories.SheetRepository;
+import com.javi.uned.pfgbackend.util.Formats;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,6 +49,18 @@ public class FileSystemConfig {
     public boolean exists(long sheetId) {
         File folder = new File(dataFolder, ""+sheetId);
         return folder.exists();
+    }
+
+    public boolean hasPDF(long sheetId) {
+        File folder = new File(dataFolder, ""+sheetId);
+        File file = new File(folder, sheetId + Formats.PDF);
+        return file.exists();
+    }
+
+    public boolean hasXML(long sheetId) {
+        File folder = new File(dataFolder, ""+sheetId);
+        File file = new File(folder, sheetId + Formats.MUSICXML);
+        return file.exists();
     }
 
 }
