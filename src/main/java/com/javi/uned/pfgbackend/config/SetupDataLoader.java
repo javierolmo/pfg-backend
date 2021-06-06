@@ -1,24 +1,30 @@
 package com.javi.uned.pfgbackend.config;
 
-import com.javi.uned.pfgbackend.beans.Privilege;
-import com.javi.uned.pfgbackend.beans.Role;
-import com.javi.uned.pfgbackend.beans.User;
-import com.javi.uned.pfgbackend.repositories.PrivilegeRepository;
-import com.javi.uned.pfgbackend.repositories.RoleRepository;
-import com.javi.uned.pfgbackend.services.UserService;
+import com.javi.uned.pfgbackend.adapters.database.privilege.PrivilegeEntity;
+import com.javi.uned.pfgbackend.adapters.database.privilege.PrivilegeRepository;
+import com.javi.uned.pfgbackend.adapters.database.role.RoleEntity;
+import com.javi.uned.pfgbackend.adapters.database.role.RoleRepository;
+import com.javi.uned.pfgbackend.domain.exceptions.ExistingUserException;
+import com.javi.uned.pfgbackend.domain.exceptions.ValidationException;
+import com.javi.uned.pfgbackend.domain.user.UserService;
+import com.javi.uned.pfgbackend.domain.user.model.User;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.stereotype.Component;
+
 import javax.transaction.Transactional;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
 
 @Component
 public class SetupDataLoader implements ApplicationListener<ContextRefreshedEvent> {
 
     boolean alreadySetup = false;
+    private final Logger logger = LoggerFactory.getLogger(SetupDataLoader.class);
 
     @Autowired
     private RoleRepository roleRepository;
@@ -33,64 +39,57 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
     @Transactional
     public void onApplicationEvent(ContextRefreshedEvent event) {
 
-        if (alreadySetup)
-            return;
-        Privilege readPrivilege = createPrivilegeIfNotFound("READ_PRIVILEGE");
-        Privilege writePrivilege = createPrivilegeIfNotFound("WRITE_PRIVILEGE");
+        if (alreadySetup) return;
 
-        List<Privilege> adminPrivileges = Arrays.asList(readPrivilege, writePrivilege);
-        createRoleIfNotFound("ROLE_ADMIN", adminPrivileges);
-        createRoleIfNotFound("ROLE_USER", Arrays.asList(readPrivilege));
+        // Declare and create privileges
+        PrivilegeEntity readLogsPrivilegeEntity = createPrivilegeIfNotFound("READ_LOGS");
+        PrivilegeEntity disableUsersPrivilegeEntity = createPrivilegeIfNotFound("DISABLE_USERS");
+        PrivilegeEntity[] privilegeEntities = new PrivilegeEntity[]{readLogsPrivilegeEntity, disableUsersPrivilegeEntity};
 
-        if(!userService.existsByEmail("olmo.injerto.javier@gmail.com")){
-            Role adminRole = roleRepository.findByName("ROLE_ADMIN");
-            Collection<Role> roles = Arrays.asList(adminRole);
-            User user = new User();
-            user.setEmail("olmo.injerto.javier@gmail.com");
-            user.setPassword("5885");
-            user.setName("Javier");
-            user.setSurname("Olmo");
-            user.setEnabled(true);
-            user.setRoles(roles);
-            userService.createUser(user);
-        }
+        // Declare and create roles
+        RoleEntity adminRoleEntity = createRoleIfNotFound("ROLE_ADMIN", Arrays.asList(readLogsPrivilegeEntity, disableUsersPrivilegeEntity));
+        RoleEntity userRoleEntity = createRoleIfNotFound("ROLE_USER", new ArrayList<>());
+        RoleEntity[] roleEntities = new RoleEntity[]{adminRoleEntity, userRoleEntity};
 
-        if(!userService.existsByEmail("tester@gmail.com")){
-            Role userRole = roleRepository.findByName("ROLE_USER");
-            Collection<Role> roles = Arrays.asList(userRole);
-            User user = new User();
-            user.setEmail("tester@gmail.com");
-            user.setPassword("5885");
-            user.setName("TesterName");
-            user.setSurname("TesterSurname");
-            user.setEnabled(true);
-            user.setRoles(roles);
-            userService.createUser(user);
+
+        // Declare users
+        User javi = new User(null, "jolmo60@alumno.uned.es", "1234", "Javier", "Olmo Injerto", true, Arrays.asList(adminRoleEntity.toRole()));
+        User tester = new User(null, "tester@gmail.com", "1234", "Tester", "Appelido1 Apellido2", true, Arrays.asList(userRoleEntity.toRole()));
+        User juanManuel = new User(null, "jmcuadra@dia.uned.es", "1234", "Javier", "Olmo Injerto", true, Arrays.asList(userRoleEntity.toRole()));
+        User[] users = new User[]{javi, tester, juanManuel};
+
+        // Create users
+        for(User user : users) {
+            try {
+                userService.registerUser(user);
+            } catch (ValidationException | ExistingUserException e) {
+                logger.debug("Omitting user creation: " + user.getEmail(), e);
+            }
         }
 
         alreadySetup = true;
     }
 
     @Transactional
-    private Privilege createPrivilegeIfNotFound(String name) {
-        Privilege privilege = privilegeRepository.findByName(name);
-        if (privilege == null) {
-            privilege = new Privilege();
-            privilege.setName(name);
-            privilegeRepository.save(privilege);
+    private PrivilegeEntity createPrivilegeIfNotFound(String name) {
+        PrivilegeEntity privilegeEntity = privilegeRepository.findByName(name);
+        if (privilegeEntity == null) {
+            privilegeEntity = new PrivilegeEntity();
+            privilegeEntity.setName(name);
+            privilegeRepository.save(privilegeEntity);
         }
-        return privilege;
+        return privilegeEntity;
     }
 
     @Transactional
-    private Role createRoleIfNotFound(String name, Collection<Privilege> privileges) {
-        Role role = roleRepository.findByName(name);
-        if (role == null) {
-            role = new Role();
-            role.setName(name);
-            role.setPrivileges(privileges);
-            roleRepository.save(role);
+    private RoleEntity createRoleIfNotFound(String name, Collection<PrivilegeEntity> privilegeEntities) {
+        RoleEntity roleEntity = roleRepository.findByName(name);
+        if (roleEntity == null) {
+            roleEntity = new RoleEntity();
+            roleEntity.setName(name);
+            roleEntity.setPrivilegeEntities(privilegeEntities);
+            roleRepository.save(roleEntity);
         }
-        return role;
+        return roleEntity;
     }
 }

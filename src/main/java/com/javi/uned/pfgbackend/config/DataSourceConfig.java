@@ -10,14 +10,23 @@ import javax.sql.DataSource;
 @Configuration
 public class DataSourceConfig {
 
+    // Host
     @Value("${DB_HOST:localhost}")
     private String dbHost;
+
+    // Port
     @Value("${DB_PORT:3307}")
     private String dbPort;
+
+    // Database user
     @Value("${DB_USER:pfg}")
     private String dbUser;
+
+    // Database password
     @Value("${DB_PASS:47921093pP}")
     private String dbPass;
+
+    // Database schema
     @Value("${DB_SCHEMA:melodia}")
     private String dbSchema;
 

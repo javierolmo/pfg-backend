@@ -1,6 +1,6 @@
 package com.javi.uned.pfgbackend.config;
 
-import com.javi.uned.pfgbackend.exceptions.AuthException;
+import com.javi.uned.pfgbackend.domain.exceptions.AuthException;
 import io.jsonwebtoken.*;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;

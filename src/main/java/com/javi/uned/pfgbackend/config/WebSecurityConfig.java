@@ -1,6 +1,7 @@
 package com.javi.uned.pfgbackend.config;
 
-import com.javi.uned.pfgbackend.services.CustomUserDetailsService;
+import com.javi.uned.pfgbackend.domain.user.UserService;
+import com.javi.uned.pfgbackend.domain.user.CustomUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -19,12 +20,13 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     private PasswordEncoder passwordEncoder;
     @Autowired
-    private CustomAuthenticationProvider authenticationProvider;
+    private UserService userService;
+
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder);
-        auth.authenticationProvider(authenticationProvider);
+        auth.authenticationProvider(userService);
     }
 
     @Override

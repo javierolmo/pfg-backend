@@ -2,8 +2,8 @@ package com.javi.uned.pfgbackend.config;
 
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.AppenderBase;
-import com.javi.uned.pfgbackend.beans.Log;
-import com.javi.uned.pfgbackend.repositories.LogRepository;
+import com.javi.uned.pfgbackend.adapters.database.log.Log;
+import com.javi.uned.pfgbackend.adapters.database.log.LogRepository;
 
 import java.time.Instant;
 import java.time.ZoneId;

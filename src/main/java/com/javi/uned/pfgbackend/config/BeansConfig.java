@@ -1,7 +1,7 @@
 package com.javi.uned.pfgbackend.config;
 
-import com.javi.uned.pfgbackend.beans.Sheet;
-import com.javi.uned.pfgbackend.beans.User;
+import com.javi.uned.pfgbackend.adapters.database.sheet.Sheet;
+import com.javi.uned.pfgbackend.adapters.database.user.UserEntity;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Scope;
@@ -19,12 +19,5 @@ public class BeansConfig {
         return new BCryptPasswordEncoder();
     }
 
-    @Bean
-    @Scope("prototype")
-    public Sheet sheet(User user){
-        Sheet sheet = new Sheet();
-        sheet.setOwnerId(1L);
-        sheet.setDate(LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
-        return sheet;
-    }
+
 }
