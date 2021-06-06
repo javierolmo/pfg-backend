@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 @CrossOrigin
 @RestController
 @Api(tags = "Measures")
-public class MeasureControllerImpl {
+public class MeasureControllerImpl implements MeasureController{
 
     public ResponseEntity getAvailableMeasures() {
         return ResponseEntity.ok(Compases.getCompases());
