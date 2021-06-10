@@ -63,4 +63,9 @@ public class FileSystemConfig {
         return file.exists();
     }
 
+    public Boolean hasSpecs(long sheetId) {
+        File folder = new File(dataFolder, ""+sheetId);
+        File file = new File(folder, "specs.json");
+        return file.exists();
+    }
 }

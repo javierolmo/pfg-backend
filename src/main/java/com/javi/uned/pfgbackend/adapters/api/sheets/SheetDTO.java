@@ -4,7 +4,6 @@ public class SheetDTO {
 
     private Integer id;
     private String name;
-    private String style;
     private String date;
     private Long ownerId;
     private Boolean finished;
@@ -26,14 +25,6 @@ public class SheetDTO {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public String getStyle() {
-        return style;
-    }
-
-    public void setStyle(String style) {
-        this.style = style;
     }
 
     public String getDate() {

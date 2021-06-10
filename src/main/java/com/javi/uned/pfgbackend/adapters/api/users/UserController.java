@@ -1,8 +1,6 @@
 package com.javi.uned.pfgbackend.adapters.api.users;
 
 import com.javi.uned.pfg.model.Specs;
-import com.javi.uned.pfgbackend.adapters.database.sheet.Sheet;
-import com.javi.uned.pfgbackend.adapters.database.user.UserEntity;
 import com.javi.uned.pfgbackend.domain.exceptions.EntityNotFound;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;

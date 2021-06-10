@@ -1,10 +1,12 @@
 package com.javi.uned.pfgbackend.adapters.database.sheet;
 
+import com.javi.uned.pfgbackend.domain.sheet.model.Sheet;
+
 import javax.persistence.*;
 
 @Entity
 @Table(name = "sheets")
-public class Sheet {
+public class SheetEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -12,8 +14,6 @@ public class Sheet {
     private Integer id;
     @Column(name = "name")
     private String name;
-    @Column(name = "style")
-    private String style;
     @Column(name = "date")
     private String date;
     @Column(name = "owner_id")
@@ -35,14 +35,6 @@ public class Sheet {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public String getStyle() {
-        return style;
-    }
-
-    public void setStyle(String style) {
-        this.style = style;
     }
 
     public String getDate() {
@@ -68,4 +60,9 @@ public class Sheet {
     public void setFinished(Boolean finished) {
         this.finished = finished;
     }
+
+    public Sheet toSheet() {
+        return new Sheet(id, name, date, ownerId, finished);
+    }
+
 }

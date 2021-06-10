@@ -3,7 +3,8 @@ package com.javi.uned.pfgbackend.adapters.api.users;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.javi.uned.pfg.model.Instrumento;
 import com.javi.uned.pfg.model.Specs;
-import com.javi.uned.pfgbackend.adapters.database.sheet.Sheet;
+import com.javi.uned.pfgbackend.domain.sheet.SheetService;
+import com.javi.uned.pfgbackend.domain.sheet.model.Sheet;
 import com.javi.uned.pfgbackend.adapters.database.sheet.SheetRepository;
 import com.javi.uned.pfgbackend.config.FileSystemConfig;
 import com.javi.uned.pfgbackend.config.JWTAuthorizationFilter;
@@ -22,7 +23,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
@@ -43,7 +43,7 @@ public class UserControllerImpl implements UserController {
     @Autowired
     private CustomUserDetailsService customUserDetailsService;
     @Autowired
-    private SheetRepository sheetRepository;
+    private SheetService sheetService;
     @Autowired
     private KafkaTemplate<String, Specs> specsTemplate;
     @Autowired
@@ -81,14 +81,16 @@ public class UserControllerImpl implements UserController {
     public ResponseEntity composeSheet(Specs specs, Long userId) throws IOException {
 
         //Create new sheet
-        Sheet sheet = new Sheet();
-        sheet.setDate(LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss")));
-        sheet.setOwnerId(userId);
-        sheet.setName(specs.getMovementTitle());
-        sheet.setFinished(false);
+        Sheet sheet = new Sheet(
+                null,
+                specs.getMovementTitle(),
+                LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss")),
+                userId,
+                false
+        );
 
         //Save in database
-        sheetRepository.save(sheet);
+        sheet = sheetService.save(sheet);
 
         //Complete instruments info
         Instrumento[] instrumentosIncompletos = specs.getInstrumentos();
@@ -100,7 +102,8 @@ public class UserControllerImpl implements UserController {
 
         // Save request in json
         ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.writeValue(new File(fileSystemConfig.getSheetFolder(sheet.getId()), "specs.json"), specs);
+        File specsFile = new File(fileSystemConfig.getSheetFolder(sheet.getId()), "specs.json");
+        objectMapper.writeValue(specsFile, specs);
 
         //Order composition request
         String sheetid = "" + sheet.getId();
