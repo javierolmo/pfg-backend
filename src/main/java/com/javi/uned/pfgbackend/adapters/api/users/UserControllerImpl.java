@@ -3,10 +3,9 @@ package com.javi.uned.pfgbackend.adapters.api.users;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.javi.uned.pfg.model.Instrumento;
 import com.javi.uned.pfg.model.Specs;
+import com.javi.uned.pfgbackend.adapters.filesystem.FileService;
 import com.javi.uned.pfgbackend.domain.sheet.SheetService;
 import com.javi.uned.pfgbackend.domain.sheet.model.Sheet;
-import com.javi.uned.pfgbackend.adapters.database.sheet.SheetRepository;
-import com.javi.uned.pfgbackend.config.FileSystemConfig;
 import com.javi.uned.pfgbackend.config.JWTAuthorizationFilter;
 import com.javi.uned.pfgbackend.domain.exceptions.AuthException;
 import com.javi.uned.pfgbackend.domain.exceptions.EntityNotFound;
@@ -49,7 +48,7 @@ public class UserControllerImpl implements UserController {
     @Autowired
     private InstrumentService instrumentService;
     @Autowired
-    private FileSystemConfig fileSystemConfig;
+    private FileService fileService;
     @Autowired
     private UserService userService;
 
@@ -102,7 +101,7 @@ public class UserControllerImpl implements UserController {
 
         // Save request in json
         ObjectMapper objectMapper = new ObjectMapper();
-        File specsFile = new File(fileSystemConfig.getSheetFolder(sheet.getId()), "specs.json");
+        File specsFile = new File(fileService.getSheetFolder(sheet.getId()), "specs.json");
         objectMapper.writeValue(specsFile, specs);
 
         //Order composition request

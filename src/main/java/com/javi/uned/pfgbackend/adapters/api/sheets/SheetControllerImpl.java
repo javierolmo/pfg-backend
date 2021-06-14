@@ -1,8 +1,6 @@
 package com.javi.uned.pfgbackend.adapters.api.sheets;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.javi.uned.pfg.model.Specs;
-import com.javi.uned.pfgbackend.config.FileSystemConfig;
+import com.javi.uned.pfgbackend.adapters.filesystem.FileService;
 import com.javi.uned.pfgbackend.domain.enums.Formats;
 import com.javi.uned.pfgbackend.domain.exceptions.EntityNotFound;
 import com.javi.uned.pfgbackend.domain.exceptions.RetryException;
@@ -12,15 +10,11 @@ import io.swagger.annotations.Api;
 import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
-import org.springframework.data.domain.Example;
-import org.springframework.data.domain.ExampleMatcher;
-import org.springframework.data.domain.ExampleMatcher.GenericPropertyMatcher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -28,9 +22,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @CrossOrigin
@@ -40,8 +32,6 @@ public class SheetControllerImpl implements SheetController {
 
     @Autowired
     private SheetService sheetService;
-    @Autowired
-    private FileSystemConfig fileSystemConfig;
 
 
     public Page<SheetDTO> getSheets(int page, int size, String text) {
@@ -51,7 +41,7 @@ public class SheetControllerImpl implements SheetController {
         Page<Sheet> sheetPage = sheetService.getSheetPage(pageRequest, text);
 
         // Transform to DTO and return
-        Page<SheetDTO> sheetDTOPage = sheetPage.map(sheet -> SheetDTOTransformer.toTransferObject(sheet, fileSystemConfig));
+        Page<SheetDTO> sheetDTOPage = sheetPage.map(sheet -> SheetDTOTransformer.toTransferObject(sheet, sheetService));
         return sheetDTOPage;
     }
 
@@ -62,7 +52,7 @@ public class SheetControllerImpl implements SheetController {
 
         // Building DTOs and return
         List<SheetDTO> result = sheets.stream()
-                .map(sheet1 -> SheetDTOTransformer.toTransferObject(sheet1, fileSystemConfig))
+                .map(sheet1 -> SheetDTOTransformer.toTransferObject(sheet1, sheetService))
                 .collect(Collectors.toList());
         return result;
     }
@@ -83,7 +73,7 @@ public class SheetControllerImpl implements SheetController {
         try {
             Sheet sheet = sheetService.getSheet(id);
 
-            SheetDTO sheetDTO = SheetDTOTransformer.toTransferObject(sheet, fileSystemConfig);
+            SheetDTO sheetDTO = SheetDTOTransformer.toTransferObject(sheet, sheetService);
             return ResponseEntity.ok(sheetDTO);
         } catch (EntityNotFound entityNotFound) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(entityNotFound.getMessage());
@@ -99,7 +89,7 @@ public class SheetControllerImpl implements SheetController {
 
         try {
             // File
-            File file = new File(fileSystemConfig.getSheetFolder(id), id + Formats.PDF);
+            File file = sheetService.pdfFile(id);
             byte[] bytes = FileUtils.readFileToByteArray(file);
 
             // Headers
@@ -118,7 +108,7 @@ public class SheetControllerImpl implements SheetController {
 
         try {
             // File
-            File file = new File(fileSystemConfig.getSheetFolder(id), id + Formats.MUSICXML);
+            File file = sheetService.xmlFile(id);
             byte[] bytes = FileUtils.readFileToByteArray(file);
 
             // Headers
@@ -138,7 +128,7 @@ public class SheetControllerImpl implements SheetController {
     public ResponseEntity visualizeSpecs(int id) {
         try {
             // File
-            File file = new File(fileSystemConfig.getSheetFolder(id), "specs.json"); //TODO: Llevarse esta lógica a otra parte
+            File file = sheetService.specsFile(id);
             byte[] bytes = FileUtils.readFileToByteArray(file);
 
             // Headers
@@ -165,7 +155,7 @@ public class SheetControllerImpl implements SheetController {
     public ResponseEntity downloadFileXML(int id) {
         try {
             Sheet sheet = sheetService.getSheet(id);
-            File file = new File(fileSystemConfig.getSheetFolder(id), id + Formats.MUSICXML); //TODO: Hay que llevar esta lógica a otra parte, no debería estar en el Api
+            File file = sheetService.xmlFile(id);
             InputStreamResource resource = new InputStreamResource(new FileInputStream(file));
             return ResponseEntity.ok()
                     .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + sheet.getName() + Formats.MUSICXML + "\"")
@@ -182,7 +172,7 @@ public class SheetControllerImpl implements SheetController {
     public ResponseEntity downloadFilePDF(int id) {
         try {
             Sheet sheet = sheetService.getSheet(id);
-            File file = new File(fileSystemConfig.getSheetFolder(id), id + Formats.PDF); //TODO: Hay que llevar esta lógica a otra parte, no debería estar en el Api
+            File file = sheetService.pdfFile(id);
             InputStreamResource resource = new InputStreamResource(new FileInputStream(file));
             return ResponseEntity.ok()
                     .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + sheet.getName() + Formats.PDF + "\"")

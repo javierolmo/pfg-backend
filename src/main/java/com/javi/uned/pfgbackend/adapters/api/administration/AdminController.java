@@ -1,6 +1,6 @@
 package com.javi.uned.pfgbackend.adapters.api.administration;
 
-import com.javi.uned.pfgbackend.adapters.database.log.Log;
+import com.javi.uned.pfgbackend.adapters.database.log.LogEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -17,7 +17,7 @@ public interface AdminController {
      * @return
      */
     @GetMapping(value = "/api/admin/logs/page", produces = MediaType.APPLICATION_JSON_VALUE)
-    ResponseEntity<Page<Log>> getLogs(
+    ResponseEntity<Page<LogEntity>> getLogs(
             @RequestParam(defaultValue = "30", required = false) int size,
             @RequestParam(defaultValue = "0", required = false) int index,
             @RequestParam(defaultValue = "true", required = false) boolean ascendent);

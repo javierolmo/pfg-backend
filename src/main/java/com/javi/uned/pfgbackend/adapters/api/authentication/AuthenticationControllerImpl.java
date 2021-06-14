@@ -3,11 +3,15 @@ package com.javi.uned.pfgbackend.adapters.api.authentication;
 import com.javi.uned.pfgbackend.adapters.api.authentication.model.LoginDTO;
 import com.javi.uned.pfgbackend.adapters.api.authentication.model.LoginResponse;
 import com.javi.uned.pfgbackend.adapters.api.authentication.model.LoginResponseData;
+import com.javi.uned.pfgbackend.adapters.api.users.UserDTOTransformer;
+import com.javi.uned.pfgbackend.domain.exceptions.ExistingUserException;
+import com.javi.uned.pfgbackend.domain.exceptions.ValidationException;
 import com.javi.uned.pfgbackend.domain.user.TokenFactory;
 import com.javi.uned.pfgbackend.adapters.api.users.UserDTO;
 import com.javi.uned.pfgbackend.adapters.database.user.UserEntity;
 import com.javi.uned.pfgbackend.config.WebSecurityConfig;
 import com.javi.uned.pfgbackend.domain.user.UserService;
+import com.javi.uned.pfgbackend.domain.user.model.User;
 import io.swagger.annotations.Api;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,9 +58,17 @@ public class AuthenticationControllerImpl implements AuthenticationController {
     }
 
     public ResponseEntity register(UserDTO userDTO) {
-        UserEntity userEntity = new UserEntity();
-        //TODO:
-        return null;
+        try {
+            User user = UserDTOTransformer.toDomainObject(userDTO);
+            userService.registerUser(user);
+            return ResponseEntity.ok(userDTO);
+        } catch (ValidationException e) {
+            logger.warn("Invalid sign up request (user: {})", userDTO.getEmail());
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (ExistingUserException e) {
+            logger.warn("Already existing user trying to sign up (user: {})", userDTO.getEmail());
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
+        }
     }
 
 }

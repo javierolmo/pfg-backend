@@ -1,8 +1,8 @@
 package com.javi.uned.pfgbackend.adapters.messagebroker;
 
+import com.javi.uned.pfgbackend.adapters.filesystem.FileService;
 import com.javi.uned.pfgbackend.domain.exceptions.EntityNotFound;
 import com.javi.uned.pfgbackend.domain.sheet.SheetService;
-import com.javi.uned.pfgbackend.config.FileSystemConfig;
 import com.javi.uned.pfgbackend.domain.enums.Formats;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
@@ -22,7 +22,7 @@ public class PdfConsumer {
     private final static Logger logger = LoggerFactory.getLogger(PdfConsumer.class);
 
     @Autowired
-    private FileSystemConfig fileSystemConfig;
+    private FileService fileService;
     @Autowired
     private SheetService sheetService;
 
@@ -32,18 +32,14 @@ public class PdfConsumer {
         long keyLong = Long.parseLong(key);
 
         // Receive and save pdf
-        File dir = fileSystemConfig.getSheetFolder(Long.parseLong(key));
+        File dir = fileService.getSheetFolder(Long.parseLong(key));
         File pdfFile = new File(String.format("%s/%s%s", dir.getAbsolutePath(), key, Formats.PDF));
         FileUtils.writeByteArrayToFile(pdfFile, rawFile);
 
         // Mark as finished
-        if (fileSystemConfig.hasPDF(keyLong) && fileSystemConfig.hasXML(keyLong)) {
-            try {
-                int id = Integer.parseInt(key);
-                sheetService.markAsFinished(id);
-            } catch (EntityNotFound enfe) {
-                logger.error("Could not mark sheet as finished: " + enfe.getMessage());
-            }
+        if (fileService.hasPDF(keyLong) && fileService.hasXML(keyLong)) {
+            int id = Integer.parseInt(key);
+            sheetService.markAsFinished(id);
         }
     }
 
