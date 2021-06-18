@@ -1,4 +1,6 @@
-package com.javi.uned.pfgbackend.adapters.api.users.model;
+package com.javi.uned.pfgbackend.adapters.api.roles;
+
+import com.javi.uned.pfgbackend.adapters.api.privileges.PrivilegeDTO;
 
 import java.util.ArrayList;
 import java.util.Collection;

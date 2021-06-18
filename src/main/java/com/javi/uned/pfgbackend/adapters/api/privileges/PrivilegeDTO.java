@@ -1,4 +1,4 @@
-package com.javi.uned.pfgbackend.adapters.api.users.model;
+package com.javi.uned.pfgbackend.adapters.api.privileges;
 
 public class PrivilegeDTO {
 

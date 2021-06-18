@@ -1,6 +1,8 @@
 package com.javi.uned.pfgbackend.adapters.api.users.model;
 
 import com.javi.uned.pfgbackend.adapters.api.authentication.model.RegistrationRequest;
+import com.javi.uned.pfgbackend.adapters.api.roles.RoleDTO;
+import com.javi.uned.pfgbackend.adapters.api.roles.RoleDTOTransformer;
 import com.javi.uned.pfgbackend.domain.user.model.Role;
 import com.javi.uned.pfgbackend.domain.user.model.User;
 
