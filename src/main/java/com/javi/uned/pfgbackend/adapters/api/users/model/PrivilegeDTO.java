@@ -1,8 +1,4 @@
-package com.javi.uned.pfgbackend.adapters.api.users;
-
-import com.javi.uned.pfgbackend.adapters.database.role.RoleEntity;
-
-import java.util.Collection;
+package com.javi.uned.pfgbackend.adapters.api.users.model;
 
 public class PrivilegeDTO {
 

@@ -1,4 +1,4 @@
-package com.javi.uned.pfgbackend.config;
+package com.javi.uned.pfgbackend.config.database;
 
 import com.javi.uned.pfgbackend.adapters.database.privilege.PrivilegeEntity;
 import com.javi.uned.pfgbackend.adapters.database.privilege.PrivilegeRepository;
@@ -23,9 +23,8 @@ import java.util.Collection;
 @Component
 public class SetupDataLoader implements ApplicationListener<ContextRefreshedEvent> {
 
-    boolean alreadySetup = false;
     private final Logger logger = LoggerFactory.getLogger(SetupDataLoader.class);
-
+    boolean alreadySetup = false;
     @Autowired
     private RoleRepository roleRepository;
 
@@ -53,13 +52,13 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
 
 
         // Declare users
-        User javi = new User(null, "jolmo60@alumno.uned.es", "1234", "Javier", "Olmo Injerto", true, Arrays.asList(adminRoleEntity.toRole()));
-        User tester = new User(null, "tester@gmail.com", "1234", "Tester", "Appelido1 Apellido2", true, Arrays.asList(userRoleEntity.toRole()));
-        User juanManuel = new User(null, "jmcuadra@dia.uned.es", "1234", "Javier", "Olmo Injerto", true, Arrays.asList(userRoleEntity.toRole()));
-        User[] users = new User[]{javi, tester, juanManuel};
+        User javi = new User(null, "jolmo60@alumno.uned.es", "1234", "Javier", "Olmo Injerto", true, new ArrayList<>());
+        User tester = new User(null, "tester@gmail.com", "1234", "Tester", "Appelido1 Apellido2", true, new ArrayList<>());
+        User joseManuel = new User(null, "jmcuadra@dia.uned.es", "1234", "Jose Manuel", "Cuadra Troncoso", true, new ArrayList<>());
+        User[] users = new User[]{javi, tester, joseManuel};
 
         // Create users
-        for(User user : users) {
+        for (User user : users) {
             try {
                 userService.registerUser(user);
             } catch (ValidationException | ExistingUserException e) {

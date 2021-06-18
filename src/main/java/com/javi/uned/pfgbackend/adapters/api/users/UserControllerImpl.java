@@ -3,16 +3,18 @@ package com.javi.uned.pfgbackend.adapters.api.users;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.javi.uned.pfg.model.Instrumento;
 import com.javi.uned.pfg.model.Specs;
+import com.javi.uned.pfgbackend.adapters.api.users.model.UserDTO;
+import com.javi.uned.pfgbackend.adapters.api.users.model.UserDTOTransformer;
 import com.javi.uned.pfgbackend.adapters.filesystem.FileService;
-import com.javi.uned.pfgbackend.domain.sheet.SheetService;
-import com.javi.uned.pfgbackend.domain.sheet.model.Sheet;
 import com.javi.uned.pfgbackend.config.JWTAuthorizationFilter;
 import com.javi.uned.pfgbackend.domain.exceptions.AuthException;
 import com.javi.uned.pfgbackend.domain.exceptions.EntityNotFound;
 import com.javi.uned.pfgbackend.domain.instrument.InstrumentService;
+import com.javi.uned.pfgbackend.domain.sheet.SheetService;
+import com.javi.uned.pfgbackend.domain.sheet.model.Sheet;
+import com.javi.uned.pfgbackend.domain.user.CustomUserDetailsService;
 import com.javi.uned.pfgbackend.domain.user.UserService;
 import com.javi.uned.pfgbackend.domain.user.model.User;
-import com.javi.uned.pfgbackend.domain.user.CustomUserDetailsService;
 import io.jsonwebtoken.Claims;
 import io.swagger.annotations.Api;
 import org.slf4j.Logger;
@@ -59,7 +61,9 @@ public class UserControllerImpl implements UserController {
         List<User> users = userService.findAll();
 
         // Transform to DTOs and return
-        List<UserDTO> userDTOs = users.stream().map(user -> user.toTransferObject()).collect(Collectors.toList());
+        List<UserDTO> userDTOs = users.stream()
+                .map(UserDTOTransformer::toTransferObject)
+                .collect(Collectors.toList());
         return ResponseEntity.ok(userDTOs);
     }
 
@@ -69,7 +73,7 @@ public class UserControllerImpl implements UserController {
 
             // Get user
             User user = userService.findById(id);
-            UserDTO userDTO = user.toTransferObject();
+            UserDTO userDTO = UserDTOTransformer.toTransferObject(user);
             return ResponseEntity.ok(userDTO);
 
         } catch (EntityNotFound e) {
@@ -132,6 +136,23 @@ public class UserControllerImpl implements UserController {
         } catch (AuthException e) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
         }
+
+    }
+
+    @Override
+    public ResponseEntity updateUser(UserDTO userDTO, Long userId) {
+
+        try {
+            User user = UserDTOTransformer.toDomainObject(userDTO);
+            user = userService.updateUser(userId, user);
+
+            userDTO = UserDTOTransformer.toTransferObject(user);
+            return ResponseEntity.ok(userDTO);
+        } catch (EntityNotFound entityNotFound) {
+            logger.error("Error updating user: {}", entityNotFound.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(entityNotFound.getMessage());
+        }
+
 
     }
 

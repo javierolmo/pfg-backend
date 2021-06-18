@@ -1,12 +1,7 @@
 package com.javi.uned.pfgbackend.domain.sheet.model;
 
 import com.javi.uned.pfgbackend.adapters.api.sheets.SheetDTO;
-import com.javi.uned.pfgbackend.adapters.api.users.UserDTO;
 import com.javi.uned.pfgbackend.adapters.database.sheet.SheetEntity;
-import com.javi.uned.pfgbackend.adapters.database.user.UserEntity;
-
-import javax.persistence.*;
-import java.util.stream.Collectors;
 
 public class Sheet {
 

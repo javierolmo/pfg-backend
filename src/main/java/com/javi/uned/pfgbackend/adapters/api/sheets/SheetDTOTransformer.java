@@ -6,8 +6,18 @@ import com.javi.uned.pfgbackend.domain.sheet.model.Sheet;
 
 public class SheetDTOTransformer {
 
+    private SheetDTOTransformer() {
+
+    }
+
     public static Sheet toDomainObject(SheetDTO sheetDTO) {
-        return new Sheet(sheetDTO.getId(), sheetDTO.getName(), sheetDTO.getDate(), sheetDTO.getOwnerId(), sheetDTO.getFinished());
+        return new Sheet(
+                sheetDTO.getId(),
+                sheetDTO.getName(),
+                sheetDTO.getDate(),
+                sheetDTO.getOwnerId(),
+                sheetDTO.getFinished()
+        );
     }
 
     public static SheetDTO toTransferObject(Sheet sheet, SheetService sheetService) {

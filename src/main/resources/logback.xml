@@ -6,7 +6,7 @@
         </encoder>
     </appender>
 
-    <appender name="database" class="com.javi.uned.pfgbackend.config.DatabaseLoggerAppender">
+    <appender name="database" class="com.javi.uned.pfgbackend.config.database.DatabaseLoggerAppender">
     </appender>
 
     <root level="info">

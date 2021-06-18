@@ -1,8 +1,7 @@
 package com.javi.uned.pfgbackend.domain.user;
 
-import com.javi.uned.pfgbackend.adapters.database.role.RoleEntity;
-import com.javi.uned.pfgbackend.adapters.database.user.UserEntity;
 import com.javi.uned.pfgbackend.config.JWTAuthorizationFilter;
+import com.javi.uned.pfgbackend.domain.user.model.Role;
 import com.javi.uned.pfgbackend.domain.user.model.User;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -15,11 +14,11 @@ import java.util.stream.Collectors;
 
 public class TokenFactory {
 
-    private TokenFactory () {
+    private TokenFactory() {
 
     }
 
-    public static String authToken(Authentication authentication, User user){
+    public static String authToken(Authentication authentication, User user) {
 
         List<GrantedAuthority> grantedAuthorities = (List<GrantedAuthority>) authentication.getAuthorities();
         String token = Jwts.builder()
@@ -37,12 +36,12 @@ public class TokenFactory {
         return JWTAuthorizationFilter.PREFIX + token;
     }
 
-    public static String personalToken(UserEntity userEntity, long duration) {
+    public static String personalToken(User user, long duration) {
 
         String token = Jwts.builder()
                 .setId("personal-token")
-                .claim("id", userEntity.getId())
-                .claim("authorities", userEntity.getRoles().stream().map(RoleEntity::getAuthority).collect(Collectors.toList()))
+                .claim("id", user.getId())
+                .claim("authorities", user.getRoles().stream().map(Role::getPrivileges).collect(Collectors.toList()))
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + duration))
                 .signWith(SignatureAlgorithm.HS512, JWTAuthorizationFilter.SECRET.getBytes())

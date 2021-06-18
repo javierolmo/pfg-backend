@@ -1,9 +1,8 @@
 package com.javi.uned.pfgbackend.domain.user;
 
-import com.javi.uned.pfgbackend.adapters.database.user.UserEntity;
 import com.javi.uned.pfgbackend.adapters.database.role.RoleRepository;
+import com.javi.uned.pfgbackend.adapters.database.user.UserEntity;
 import com.javi.uned.pfgbackend.adapters.database.user.UserRepository;
-import com.javi.uned.pfgbackend.domain.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.security.core.GrantedAuthority;
@@ -33,7 +32,7 @@ public class CustomUserDetailsService implements UserDetailsService {
         UserEntity userEntity = userRepository.findByEmail(email);
         if (userEntity == null) {
             throw new UsernameNotFoundException(String.format("No se ha podido encontrar el usuario con email %s", email));
-        }else{
+        } else {
             return new UserDetails() {
                 @Override
                 public Collection<? extends GrantedAuthority> getAuthorities() {

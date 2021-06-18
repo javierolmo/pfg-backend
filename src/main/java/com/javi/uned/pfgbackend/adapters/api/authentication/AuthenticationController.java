@@ -1,8 +1,7 @@
 package com.javi.uned.pfgbackend.adapters.api.authentication;
 
 import com.javi.uned.pfgbackend.adapters.api.authentication.model.LoginDTO;
-import com.javi.uned.pfgbackend.adapters.api.authentication.model.LoginResponse;
-import com.javi.uned.pfgbackend.adapters.api.users.UserDTO;
+import com.javi.uned.pfgbackend.adapters.api.authentication.model.RegistrationRequest;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -19,5 +18,5 @@ public interface AuthenticationController {
     ResponseEntity login(@RequestBody LoginDTO login);
 
     @PostMapping(value= "/api/auth/register", produces = MediaType.APPLICATION_JSON_VALUE)
-    ResponseEntity register(@RequestBody UserDTO userDTO);
+    ResponseEntity register(@RequestBody RegistrationRequest registrationRequest);
 }

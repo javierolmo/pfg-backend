@@ -1,8 +1,6 @@
 package com.javi.uned.pfgbackend.adapters.database.privilege;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.javi.uned.pfgbackend.adapters.database.role.RoleEntity;
-import com.javi.uned.pfgbackend.domain.user.model.Privilege;
 
 import javax.persistence.*;
 import java.util.Collection;
@@ -40,9 +38,5 @@ public class PrivilegeEntity {
 
     public void setRoleEntities(Collection<RoleEntity> roleEntities) {
         this.roleEntities = roleEntities;
-    }
-
-    public Privilege toPrivilege() {
-        return new Privilege(id, name, roleEntities);
     }
 }

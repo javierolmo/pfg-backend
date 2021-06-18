@@ -1,4 +1,4 @@
-package com.javi.uned.pfgbackend.adapters.api.users;
+package com.javi.uned.pfgbackend.adapters.api.users.model;
 
 import java.util.ArrayList;
 import java.util.Collection;

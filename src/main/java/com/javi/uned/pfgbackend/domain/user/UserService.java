@@ -1,15 +1,13 @@
 package com.javi.uned.pfgbackend.domain.user;
 
-import com.javi.uned.pfgbackend.adapters.database.user.UserEntity;
-import com.javi.uned.pfgbackend.adapters.database.user.UserRepository;
 import com.javi.uned.pfgbackend.domain.exceptions.EntityNotFound;
 import com.javi.uned.pfgbackend.domain.exceptions.ExistingUserException;
 import com.javi.uned.pfgbackend.domain.exceptions.ValidationException;
+import com.javi.uned.pfgbackend.domain.ports.database.UserDAO;
 import com.javi.uned.pfgbackend.domain.user.model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Example;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -19,9 +17,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class UserService implements AuthenticationProvider {
@@ -29,78 +26,60 @@ public class UserService implements AuthenticationProvider {
     private final Logger logger = LoggerFactory.getLogger(UserService.class);
 
     @Autowired
-    private UserRepository userRepository;
-    @Autowired
     private PasswordEncoder passwordEncoder;
+    @Autowired
+    private UserDAO userDAO;
 
-    public void registerUser(User user) throws ValidationException, ExistingUserException {
+
+    public User registerUser(User user) throws ValidationException, ExistingUserException {
 
         // Check user is valid
         checkValid(user);
 
-        // Create user entity
-        UserEntity userEntity = new UserEntity();
-        userEntity.setEmail(user.getEmail());
-        userEntity.setName(user.getName());
-        userEntity.setSurname(user.getSurname());
-        userEntity.setEnabled(false);
-        userEntity.setRoles(user.getRoles().stream().map(role -> role.toEntity()).collect(Collectors.toList()));
-        userEntity.setPassword(passwordEncoder.encode(user.getPassword()));
+        user = new User(
+                user.getId(),
+                user.getEmail(),
+                passwordEncoder.encode(user.getPassword()),
+                user.getName(),
+                user.getSurname(),
+                true,
+                new ArrayList<>()
+        );
 
         // Save user
-        userRepository.save(userEntity);
+        user = userDAO.save(user);
+        return user;
 
     }
 
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
 
-        // Unwrap authentication
-        String email = authentication.getName();
-        String password = authentication.getCredentials().toString();
+        try {
 
-        // Check credentials
-        UserEntity userEntity = new UserEntity();
-        userEntity.setEmail(email);
-        Optional<UserEntity> optionalUserEntity = userRepository.findOne(Example.of(userEntity));
-        if (optionalUserEntity.isPresent()) {
-            UserEntity existingUser = optionalUserEntity.get();
-            if (passwordEncoder.matches(password, existingUser.getPassword())) {
-                return new UsernamePasswordAuthenticationToken(email, password, userEntity.getRoles());
+            // Unwrap authentication
+            String email = authentication.getName();
+            String password = authentication.getCredentials().toString();
+
+            // Check credentials
+            User user = userDAO.findByEmail(email);
+            if (passwordEncoder.matches(password, user.getPassword())) {
+                return new UsernamePasswordAuthenticationToken(email, password, user.getRoles());
             } else {
                 throw new BadCredentialsException("Bad credentials");
             }
-        } else {
-            throw new UsernameNotFoundException("User with email " + email + " is not registered");
+
+        } catch (EntityNotFound entityNotFound) {
+            throw new UsernameNotFoundException(entityNotFound.getMessage());
         }
+
     }
 
     public User findByEmail(String email) throws EntityNotFound {
-
-        // Fetching UserEntity optional
-        UserEntity userEntity = new UserEntity();
-        userEntity.setEmail(email);
-        Optional<UserEntity> optionalUserEntity = userRepository.findOne(Example.of(userEntity));
-
-        //
-        if (optionalUserEntity.isPresent()) {
-            userEntity = optionalUserEntity.get();
-            return userEntity.toUser();
-        } else {
-            throw new EntityNotFound("No users with email '" + email + "'");
-        }
+        return userDAO.findByEmail(email);
     }
 
     public User findById(Long id) throws EntityNotFound {
-
-        // Get UserEntity optional
-        Optional<UserEntity> optionalUserEntity = userRepository.findById(id);
-        if (optionalUserEntity.isEmpty()) {
-            throw new EntityNotFound("User with id '" + id + "' not found");
-        }
-
-        // Return user
-        UserEntity userEntity = optionalUserEntity.get();
-        return userEntity.toUser();
+        return userDAO.findById(id);
     }
 
     @Override
@@ -121,21 +100,15 @@ public class UserService implements AuthenticationProvider {
         }
 
         // Check existing email user
-        UserEntity userEntity = new UserEntity();
-        userEntity.setEmail(user.getEmail());
-        Optional<UserEntity> optionalUserEntity = userRepository.findOne(Example.of(userEntity));
-        if (optionalUserEntity.isPresent()) throw new ExistingUserException("Email already registered!");
+        if (userDAO.existsByEmail(user.getEmail())) {
+            throw new ExistingUserException("Email already registered!");
+        }
 
     }
 
     public String generateToken(Long id, long duration) throws EntityNotFound {
 
-        UserEntity tokenOwner = null;
-
-        // Check if token owner exists
-        Optional<UserEntity> optionalUser = userRepository.findById(id);
-        if (!optionalUser.isPresent()) throw new EntityNotFound("Token owner does not exist (userid: " + id + ")");
-        tokenOwner = optionalUser.get();
+        User tokenOwner = userDAO.findById(id);
 
 
         // Generate personal token
@@ -146,12 +119,22 @@ public class UserService implements AuthenticationProvider {
     }
 
     public List<User> findAll() {
+        return userDAO.findAll();
+    }
 
-        // Get user entities
-        List<UserEntity> userEntities = userRepository.findAll();
+    public User updateUser(Long id, User userModified) throws EntityNotFound {
 
-        //Transform to users and return
-        List<User> users = userEntities.stream().map(userEntity -> userEntity.toUser()).collect(Collectors.toList());
-        return users;
+        User oldUser = findById(id);
+        User newUser = new User(
+                id,
+                userModified.getEmail(),
+                oldUser.getPassword(),
+                userModified.getName(),
+                userModified.getSurname(),
+                userModified.getEnabled(),
+                oldUser.getRoles());
+
+        return userDAO.save(newUser);
+
     }
 }

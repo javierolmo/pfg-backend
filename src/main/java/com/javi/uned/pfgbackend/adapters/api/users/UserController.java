@@ -1,6 +1,7 @@
 package com.javi.uned.pfgbackend.adapters.api.users;
 
 import com.javi.uned.pfg.model.Specs;
+import com.javi.uned.pfgbackend.adapters.api.users.model.UserDTO;
 import com.javi.uned.pfgbackend.domain.exceptions.EntityNotFound;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -49,4 +50,8 @@ public interface UserController {
             @PathVariable Long id,
             @RequestParam(defaultValue = "2592000000", required = false) long duration,
             HttpServletRequest request);
+
+    @PostMapping(value = "/api/users/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    ResponseEntity updateUser(@RequestBody UserDTO userDTO, @PathVariable Long userId);
+
 }

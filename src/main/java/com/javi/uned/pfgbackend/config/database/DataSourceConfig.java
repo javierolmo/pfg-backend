@@ -1,4 +1,4 @@
-package com.javi.uned.pfgbackend.config;
+package com.javi.uned.pfgbackend.config.database;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.jdbc.DataSourceBuilder;

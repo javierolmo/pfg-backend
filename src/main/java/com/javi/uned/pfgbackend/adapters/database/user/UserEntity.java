@@ -1,11 +1,9 @@
 package com.javi.uned.pfgbackend.adapters.database.user;
 
 import com.javi.uned.pfgbackend.adapters.database.role.RoleEntity;
-import com.javi.uned.pfgbackend.domain.user.model.User;
 
 import javax.persistence.*;
 import java.util.Collection;
-import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "users")
@@ -84,11 +82,6 @@ public class UserEntity {
 
     public void setRoles(Collection<RoleEntity> roleEntities) {
         this.roleEntities = roleEntities;
-    }
-
-    public User toUser() {
-        return new User(id, email, password, name, surname, enabled,
-                roleEntities.stream().map(roleEntity -> roleEntity.toRole()).collect(Collectors.toList()));
     }
 
 }

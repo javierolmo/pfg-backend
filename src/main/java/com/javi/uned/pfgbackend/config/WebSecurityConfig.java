@@ -1,7 +1,7 @@
 package com.javi.uned.pfgbackend.config;
 
-import com.javi.uned.pfgbackend.domain.user.UserService;
 import com.javi.uned.pfgbackend.domain.user.CustomUserDetailsService;
+import com.javi.uned.pfgbackend.domain.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -23,7 +23,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     private UserService userService;
 
     @Bean
-    public PasswordEncoder passwordEncoder(){
+    public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
@@ -37,21 +37,21 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
-            .httpBasic()
+                .httpBasic()
                 .and()
-                    .addFilterAfter(new JWTAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class)
-                    .authorizeRequests()
-                        .antMatchers("/", "/api/auth/login").permitAll()
-                        .anyRequest().permitAll()
-                        //.anyRequest().authenticated() //TODO: Solucionar esto
+                .addFilterAfter(new JWTAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class)
+                .authorizeRequests()
+                .antMatchers("/", "/api/auth/login").permitAll()
+                .anyRequest().permitAll()
+                //.anyRequest().authenticated() //TODO: Solucionar esto
                 .and()
-                    .logout()
-                        .logoutSuccessUrl("/login")
-                        .deleteCookies("auth_code", "JSESSIONID", "SPRING_SECURITY_CONTEXT")
-                        .invalidateHttpSession(true)
+                .logout()
+                .logoutSuccessUrl("/login")
+                .deleteCookies("auth_code", "JSESSIONID", "SPRING_SECURITY_CONTEXT")
+                .invalidateHttpSession(true)
                 .and()
-                    .csrf()
-                        .disable();
+                .csrf()
+                .disable();
 
     }
 
