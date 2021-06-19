@@ -1,11 +1,8 @@
 package com.javi.uned.pfgbackend.adapters.database.privilege;
 
-import com.javi.uned.pfgbackend.adapters.database.role.RoleEntity;
-import com.javi.uned.pfgbackend.adapters.database.role.RoleEntityTransformer;
-import com.javi.uned.pfgbackend.adapters.database.role.RoleRepository;
+import com.javi.uned.pfgbackend.domain.exceptions.EntityNotFound;
 import com.javi.uned.pfgbackend.domain.ports.database.PrivilegeDAO;
 import com.javi.uned.pfgbackend.domain.user.model.Privilege;
-import com.javi.uned.pfgbackend.domain.user.model.Role;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -26,5 +23,22 @@ public class PrivilegeDAOImpl implements PrivilegeDAO {
         return privilegeEntities.stream()
                 .map(PrivilegeEntityTransformer::toDomainObject)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public Privilege findByExactName(String name) throws EntityNotFound {
+        PrivilegeEntity privilegeEntity = privilegeRepository.findByName(name);
+        if (privilegeEntity == null) {
+            throw new EntityNotFound("Could not find privilege with name '"+name+"'");
+        } else {
+            return PrivilegeEntityTransformer.toDomainObject(privilegeEntity);
+        }
+    }
+
+    @Override
+    public Privilege save(Privilege privilege) {
+        PrivilegeEntity privilegeEntity = PrivilegeEntityTransformer.toEntity(privilege);
+        privilegeEntity = privilegeRepository.save(privilegeEntity);
+        return PrivilegeEntityTransformer.toDomainObject(privilegeEntity);
     }
 }

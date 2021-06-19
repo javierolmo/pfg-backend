@@ -1,10 +1,7 @@
 package com.javi.uned.pfgbackend.adapters.api.privileges;
 
-import com.javi.uned.pfgbackend.adapters.api.roles.RoleDTO;
-import com.javi.uned.pfgbackend.adapters.api.roles.RoleDTOTransformer;
 import com.javi.uned.pfgbackend.domain.user.PrivilegeService;
 import com.javi.uned.pfgbackend.domain.user.model.Privilege;
-import com.javi.uned.pfgbackend.domain.user.model.Role;
 import io.swagger.annotations.Api;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

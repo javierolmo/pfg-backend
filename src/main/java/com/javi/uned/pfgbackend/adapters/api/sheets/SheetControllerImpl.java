@@ -40,8 +40,7 @@ public class SheetControllerImpl implements SheetController {
         Page<Sheet> sheetPage = sheetService.getSheetPage(pageRequest, text);
 
         // Transform to DTO and return
-        Page<SheetDTO> sheetDTOPage = sheetPage.map(sheet -> SheetDTOTransformer.toTransferObject(sheet, sheetService));
-        return sheetDTOPage;
+        return sheetPage.map(sheet -> SheetDTOTransformer.toTransferObject(sheet, sheetService));
     }
 
     public List<SheetDTO> getSheets(String nameContains, Boolean finished, Long ownerId, Integer id) {
@@ -50,20 +49,13 @@ public class SheetControllerImpl implements SheetController {
         List<Sheet> sheets = sheetService.findBy(id, nameContains, ownerId, finished);
 
         // Building DTOs and return
-        List<SheetDTO> result = sheets.stream()
+        return sheets.stream()
                 .map(sheet1 -> SheetDTOTransformer.toTransferObject(sheet1, sheetService))
                 .collect(Collectors.toList());
-        return result;
     }
 
     public Sheet createSheet(SheetDTO sheetDTO) {
-        Sheet sheet = new Sheet(
-                sheetDTO.getId(),
-                sheetDTO.getName(),
-                sheetDTO.getDate(),
-                sheetDTO.getOwnerId(),
-                sheetDTO.getFinished()
-        );
+        Sheet sheet = SheetDTOTransformer.toDomainObject(sheetDTO);
         return sheetService.save(sheet);
     }
 

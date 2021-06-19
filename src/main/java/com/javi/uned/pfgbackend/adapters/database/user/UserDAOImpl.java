@@ -46,10 +46,9 @@ public class UserDAOImpl implements UserDAO {
     @Override
     public List<User> findAll() {
         List<UserEntity> userEntities = userRepository.findAll();
-        List<User> users = userEntities.stream()
+        return userEntities.stream()
                 .map(UserEntityTransformer::toDomainObject)
                 .collect(Collectors.toList());
-        return users;
     }
 
     @Override

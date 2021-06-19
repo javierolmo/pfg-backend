@@ -1,8 +1,5 @@
 package com.javi.uned.pfgbackend.domain.sheet.model;
 
-import com.javi.uned.pfgbackend.adapters.api.sheets.SheetDTO;
-import com.javi.uned.pfgbackend.adapters.database.sheet.SheetEntity;
-
 public class Sheet {
 
     private final Integer id;
@@ -39,23 +36,4 @@ public class Sheet {
         return finished;
     }
 
-    public SheetDTO toTransferObject() {
-        SheetDTO sheetDTO = new SheetDTO();
-        sheetDTO.setId(id);
-        sheetDTO.setName(name);
-        sheetDTO.setDate(date);
-        sheetDTO.setOwnerId(ownerId);
-        sheetDTO.setFinished(finished);
-        return sheetDTO;
-    }
-
-    public SheetEntity toEntity() {
-        SheetEntity sheetEntity = new SheetEntity();
-        sheetEntity.setId(id);
-        sheetEntity.setName(name);
-        sheetEntity.setDate(date);
-        sheetEntity.setOwnerId(ownerId);
-        sheetEntity.setFinished(finished);
-        return sheetEntity;
-    }
 }

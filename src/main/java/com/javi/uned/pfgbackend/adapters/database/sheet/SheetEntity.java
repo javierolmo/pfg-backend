@@ -1,7 +1,5 @@
 package com.javi.uned.pfgbackend.adapters.database.sheet;
 
-import com.javi.uned.pfgbackend.domain.sheet.model.Sheet;
-
 import javax.persistence.*;
 
 @Entity
@@ -59,10 +57,6 @@ public class SheetEntity {
 
     public void setFinished(Boolean finished) {
         this.finished = finished;
-    }
-
-    public Sheet toSheet() {
-        return new Sheet(id, name, date, ownerId, finished);
     }
 
 }

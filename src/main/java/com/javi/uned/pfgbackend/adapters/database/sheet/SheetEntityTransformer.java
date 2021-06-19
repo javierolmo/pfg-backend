@@ -1,14 +1,6 @@
 package com.javi.uned.pfgbackend.adapters.database.sheet;
 
-import com.javi.uned.pfgbackend.adapters.database.privilege.PrivilegeEntity;
-import com.javi.uned.pfgbackend.adapters.database.privilege.PrivilegeEntityTransformer;
-import com.javi.uned.pfgbackend.adapters.database.role.RoleEntity;
 import com.javi.uned.pfgbackend.domain.sheet.model.Sheet;
-import com.javi.uned.pfgbackend.domain.user.model.Privilege;
-import com.javi.uned.pfgbackend.domain.user.model.Role;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 public class SheetEntityTransformer {
 
@@ -27,17 +19,15 @@ public class SheetEntityTransformer {
         );
     }
 
-    public static RoleEntity toEntity(Role role) {
-
-        List<PrivilegeEntity> privilegeEntities = role.getPrivileges().stream()
-                .map(PrivilegeEntityTransformer::toEntity)
-                .collect(Collectors.toList());
-
-        RoleEntity roleEntity = new RoleEntity();
-        roleEntity.setId(role.getId());
-        roleEntity.setName(role.getName());
-        roleEntity.setPrivilegeEntities(privilegeEntities);
-        return roleEntity;
+    public static SheetEntity toEntity(Sheet sheet) {
+        SheetEntity sheetEntity = new SheetEntity();
+        sheetEntity.setId(sheet.getId());
+        sheetEntity.setName(sheet.getName());
+        sheetEntity.setDate(sheet.getDate());
+        sheetEntity.setOwnerId(sheet.getOwnerId());
+        sheetEntity.setFinished(sheet.getFinished());
+        if (sheetEntity.getFinished() == null) sheetEntity.setFinished(false);
+        return sheetEntity;
     }
 
 }

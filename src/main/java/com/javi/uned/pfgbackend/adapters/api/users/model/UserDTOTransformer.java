@@ -19,7 +19,7 @@ public class UserDTOTransformer {
     public static User toDomainObject(UserDTO userDTO) {
 
         List<Role> roles = userDTO.getRoles().stream()
-                .map(roleDTO -> RoleDTOTransformer.toDomainObject(roleDTO))
+                .map(RoleDTOTransformer::toDomainObject)
                 .collect(Collectors.toList());
 
         return new User(
